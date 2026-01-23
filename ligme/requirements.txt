@@ -1,2 +1,7 @@
 discord.py
 python-dotenv
+sympy
+flask
+numpy
+matplotlib
+aiohttp
