@@ -8,7 +8,8 @@ import numexpr
 import aiohttp
 from discord.ext import commands
 import asyncio
-
+from flask import Flask
+from threading import Thread
 
 
 
@@ -230,4 +231,17 @@ async def setup_hook():
     await bot.load_extension("cogs.graph_command")
     await bot.load_extension("cogs.slash_commands")
         
+app = Flask("")
+
+@app.route("/")
+def home():
+    return "Bot is alive!"
+
+def run():
+    app.run(host="0.0.0.0", port=10000)
+
+def keep_alive():
+    Thread(target=run).start()
+
+keep_alive()
 bot.run(token)
