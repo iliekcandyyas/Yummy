@@ -1,1 +1,1 @@
-worker: python ligme/simba.py
+worker: python simba.py
