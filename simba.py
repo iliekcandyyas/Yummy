@@ -99,9 +99,8 @@ async def on_message(message):
     if bot.user in message.mentions:
         user_message = message.content.replace(f"<@{bot.user.id}>", "").strip()
 
-    # Trigger 2: !chat prefix
-    elif message.content.startswith("!chat "):
-        user_message = message.content[len("!chat "):].strip()
+    elif message.content.startswith("^chat "):
+        user_message = message.content[len("^chat "):].strip()
 
     if user_message is None:
         await bot.process_commands(message)
@@ -306,19 +305,7 @@ async def setup_hook():
     await bot.load_extension("cogs.calculator")
     await bot.load_extension("cogs.graph_command")
     await bot.load_extension("cogs.slash_commands")
-    await bot.load_extension("cogs.gemini")
         
-app = Flask("")
-
-@app.route("/")
-def home():
-    return "Bot is alive!"
-
-def run():
-    app.run(host="0.0.0.0", port=10000)
-
-def keep_alive():
-    Thread(target=run).start()
-
-keep_alive()
 bot.run(token)
+
+
