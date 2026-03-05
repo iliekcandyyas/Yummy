@@ -16,19 +16,14 @@ from groq import Groq
 ENV_FILE = Path(__file__).resolve().parent / ".env"
 
 
-load_dotenv(dotenv_path=ENV_FILE)
+load_dotenv()  # loads .env locally if it exists, ignored on Railway
 
-
-DISCORD_TOKEN = (os.getenv("DISCORD_TOKEN") or "").strip()
-GROQ_API_KEY = (os.getenv("GROQ_API_KEY") or "").strip()
-GROQ_MODEL = (os.getenv("GROQ_MODEL") or "mixtral-8x7b-32768").strip()
-
-
-
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN", "").strip()
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
+GROQ_MODEL = os.getenv("GROQ_MODEL", "mixtral-8x7b-32768").strip()
 
 if not DISCORD_TOKEN:
-    raise SystemExit("DISCORD_TOKEN not found in .env")
-
+    raise SystemExit("DISCORD_TOKEN not set — add it to Railway Variables")
 
 import requests
 
@@ -258,5 +253,6 @@ async def setup_hook():
     await bot.load_extension("cogs.slash_commands")
         
 bot.run(token)
+
 
 
