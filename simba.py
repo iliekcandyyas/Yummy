@@ -89,64 +89,71 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if ALLOWED_CHANNEL_IDS and message.channel.id not in ALLOWED_CHANNEL_IDS:
-        await bot.process_commands(message)
-        return
+    content = message.content.lower()
 
+    # ---- Auto-reactions ----
+    if message.author.id == 1346416667466399746 or message.author.id == 1304112685599690863:
+        try:
+            await message.add_reaction("💗")
+        except (discord.Forbidden, discord.HTTPException):
+            pass
+
+    # ---- Keyword responses ----
+    if "good girl" in content:
+        if message.author.id == 1236143124481310764:
+            await message.channel.send("thank you daddy!")
+            await message.add_reaction("❤️")
+        else:
+            await message.channel.send("Sybau nigga!")
+
+    if "clanker" in content:
+        await message.channel.send("DO NOT SAY CLANKER YOU BIG BLACK NI- MONKEY.. (someone pls gib me the pass)")
+
+    if "kys" in content:
+        await message.channel.send("No promoting self harm. ~~Only I can promote it~~")
+
+    if "bitch" in content:
+        await message.channel.send("tsk tsk")
+
+    # ---- Chatbot ----
     user_message = None
 
-    # Trigger 1: @mention
     if bot.user in message.mentions:
         user_message = message.content.replace(f"<@{bot.user.id}>", "").strip()
-
     elif message.content.startswith("^chat "):
         user_message = message.content[len("^chat "):].strip()
 
-    if user_message is None:
-        await bot.process_commands(message)
-        return
+    if user_message is not None:
+        if not user_message:
+            await message.channel.send("Hey! Ask me anything.")
+        else:
+            user_id = message.author.id
+            if user_id not in conversation_histories:
+                conversation_histories[user_id] = []
 
-    if not user_message:
-        await message.channel.send("Hey! Ask me anything.")
-        return
+            conversation_histories[user_id].append({"role": "user", "content": user_message})
+            conversation_histories[user_id] = conversation_histories[user_id][-20:]
 
-    user_id = message.author.id
+            async with message.channel.typing():
+                try:
+                    response = groq_client.chat.completions.create(
+                        model=GROQ_MODEL,
+                        messages=[
+                            {"role": "system", "content": "You are a helpful assistant in a Discord server. Be concise and friendly."},
+                            *conversation_histories[user_id]
+                        ],
+                        max_tokens=1000
+                    )
+                    reply = response.choices[0].message.content
+                    conversation_histories[user_id].append({"role": "assistant", "content": reply})
 
-    if user_id not in conversation_histories:
-        conversation_histories[user_id] = []
-
-    conversation_histories[user_id].append({
-        "role": "user",
-        "content": user_message
-    })
-
-    conversation_histories[user_id] = conversation_histories[user_id][-20:]
-
-    async with message.channel.typing():
-        try:
-            response = groq_client.chat.completions.create(
-                model=GROQ_MODEL,
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant in a Discord server. Be concise and friendly."},
-                    *conversation_histories[user_id]
-                ],
-                max_tokens=1000
-            )
-            reply = response.choices[0].message.content
-
-            conversation_histories[user_id].append({
-                "role": "assistant",
-                "content": reply
-            })
-
-            if len(reply) > 2000:
-                for i in range(0, len(reply), 2000):
-                    await message.channel.send(reply[i:i+2000])
-            else:
-                await message.reply(reply)
-
-        except Exception as e:
-            await message.channel.send(f"⚠️ Error: {str(e)}")
+                    if len(reply) > 2000:
+                        for i in range(0, len(reply), 2000):
+                            await message.channel.send(reply[i:i+2000])
+                    else:
+                        await message.reply(reply)
+                except Exception as e:
+                    await message.channel.send(f"⚠️ Error: {str(e)}")
 
     await bot.process_commands(message)
 
@@ -155,31 +162,6 @@ async def on_message(message):
 async def clear_history(ctx):
     conversation_histories.pop(ctx.author.id, None)
     await ctx.send("✅ Conversation history cleared.")
-
-
-@bot.event
-async def on_message(message: discord.Message):
-    # ignore the bot's own messages to avoid loops
-    if message.author.id == bot.user.id:
-        return
-
-    # check if the message is from the target user
-    if message.author.id == 1346416667466399746:
-        try:
-            await message.add_reaction("💗")
-        except discord.Forbidden:
-            print("Missing permission to add reactions.")
-        except discord.HTTPException:
-            print("Failed to add reaction.")
-    elif message.author.id == 1304112685599690863:
-        try:
-            await message.add_reaction("💗")
-        except discord.Forbidden:
-            print("Missing permission to add reactions.")
-        except discord.HTTPException:
-            print("Failed to add reaction.")
-    
-    await bot.process_commands(message)
 
 @bot.command(name="testheart")
 async def testheart(ctx):
@@ -247,37 +229,6 @@ async def uptime(ctx):
     minutes, seconds = divmod(remainder, 60)
 
     await ctx.send(f"Uptime: {hours}h {minutes}m {seconds}s")
-
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-
-    content = message.content.lower()  
-
-    if "good girl" in content:
-        if message.author.id == 1236143124481310764:
-            await message.channel.send("thank you daddy!")
-            await message.add_reaction("❤️")
-        else:
-            await message.channel.send("Sybau nigga!")
-
-    if "clanker" in content:
-        await message.channel.send(
-            "DO NOT SAY CLANKER YOU BIG BLACK NI- MONKEY.. (someone pls gib me the pass)"
-        )
-
-    if "kys" in content:
-        await message.channel.send(
-            "No promoting self harm. ~~Only I can promote it~~"
-        )
-
-    if "bitch" in content:
-        await message.channel.send(
-            "tsk tsk"
-        )
-
-    await bot.process_commands(message)
 
 @bot.command()
 async def ateeb(ctx):
