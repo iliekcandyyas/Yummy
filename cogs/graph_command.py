@@ -250,7 +250,6 @@ async def lgraph(self, ctx, x1: float, y1: float, x2: float, y2: float):
     await ctx.send(file=discord.File(path))
     os.remove(path)
 
-
     # ---------- HELP ----------
     @commands.command(name="graphhelp")
     async def graphhelp(self, ctx):
