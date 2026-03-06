@@ -87,7 +87,7 @@ async def on_message(message):
     content = message.content.lower()
 
     # ---- Auto-reactions ----
-    if message.author.id == 1346416667466399746 or message.author.id == 1304112685599690863:
+    if message.author.id == 1346416667466399746 or message.author.id == 1304112685599690863 or message.author.id == 1236143124481310764:
         try:
             await message.add_reaction("💗")
         except (discord.Forbidden, discord.HTTPException):
