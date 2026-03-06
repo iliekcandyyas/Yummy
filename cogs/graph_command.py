@@ -235,6 +235,17 @@ class GraphCog(commands.Cog):
         await ctx.send(file=discord.File(path))
         os.remove(path)
 
+    #----------lineargraph------
+
+@bot.command()
+async def lgraph(ctx, x1: int, y1: int, x2: int, y2: int):
+    plt.plot([x1, x2], [y1, y2])
+    plt.savefig('graph.png')
+    file = discord.File('graph.png')
+    await ctx.send(file=file)
+    plt.clf()
+
+
     # ---------- HELP ----------
     @commands.command(name="graphhelp")
     async def graphhelp(self, ctx):
