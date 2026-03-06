@@ -237,13 +237,18 @@ class GraphCog(commands.Cog):
 
     #----------lineargraph------
 
-@bot.command()
-async def lgraph(ctx, x1: int, y1: int, x2: int, y2: int):
-    plt.plot([x1, x2], [y1, y2])
-    plt.savefig('graph.png')
-    file = discord.File('graph.png')
-    await ctx.send(file=file)
-    plt.clf()
+@commands.command(name="lgraph")
+async def lgraph(self, ctx, x1: float, y1: float, x2: float, y2: float):
+    fig, ax = styled_fig()
+    ax.plot([x1, x2], [y1, y2], color=COLORS[0], linewidth=2)
+    ax.scatter([x1, x2], [y1, y2], color=COLORS[1], s=80, zorder=5)
+    for x, y in [(x1, y1), (x2, y2)]:
+        ax.annotate(f"({x}, {y})", (x, y), textcoords="offset points",
+                    xytext=(8, 8), color="white")
+    ax.set_title(f"Line: ({x1},{y1}) → ({x2},{y2})")
+    path = save_and_send(fig, "lgraph")
+    await ctx.send(file=discord.File(path))
+    os.remove(path)
 
 
     # ---------- HELP ----------
