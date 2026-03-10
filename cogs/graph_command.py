@@ -253,33 +253,32 @@ class GraphCog(commands.Cog):
 
 
   # ---------- LINE CHART ----------
-# Usage: Clanker linechart 10 25 30 18 45 60
-@commands.command(name="lchart")
-async def lchart(self, ctx, *, data: str):
-    try:
-        values = [float(v) for v in data.split()]
-    except ValueError:
-        return await ctx.send("❌ Use: `Clanker linechart 10 25 30 18 45`\nAll values must be numbers.")
-    if len(values) < 2:
-        return await ctx.send("❌ Need at least 2 values.")
+# Usage: Clanker lchart 10 25 30 18 45 60
+    @commands.command(name="lchart")
+    async def lchart(self, ctx, *, data: str):
+        try:
+            values = [float(v) for v in data.split()]
+        except ValueError:
+            return await ctx.send("❌ Use: `Clanker lchart 10 25 30 18 45`\nAll values must be numbers.")
+        if len(values) < 2:
+            return await ctx.send("❌ Need at least 2 values.")
 
-    fig, ax = styled_fig()
-    xs = list(range(1, len(values) + 1))
-    ax.plot(xs, values, color=COLORS[0], linewidth=2, marker="o", markersize=5)
-    ax.fill_between(xs, values, alpha=0.1, color=COLORS[0])
+        fig, ax = styled_fig()
+        xs = list(range(1, len(values) + 1))
+        ax.plot(xs, values, color=COLORS[0], linewidth=2, marker="o", markersize=5)
+        ax.fill_between(xs, values, alpha=0.1, color=COLORS[0])
 
-    # label first and last point
-    ax.annotate(str(values[0]), (xs[0], values[0]), textcoords="offset points",
-                xytext=(6, 6), color="white", fontsize=9)
-    ax.annotate(str(values[-1]), (xs[-1], values[-1]), textcoords="offset points",
-                xytext=(6, 6), color="white", fontsize=9)
+        ax.annotate(str(values[0]), (xs[0], values[0]), textcoords="offset points",
+                    xytext=(6, 6), color="white", fontsize=9)
+        ax.annotate(str(values[-1]), (xs[-1], values[-1]), textcoords="offset points",
+                    xytext=(6, 6), color="white", fontsize=9)
 
-    ax.set_title("Line Chart")
-    ax.set_xlabel("Point")
-    ax.set_ylabel("Value")
-    path = save_and_send(fig, "linechart")
-    await ctx.send(file=discord.File(path))
-    os.remove(path)
+        ax.set_title("Line Chart")
+        ax.set_xlabel("Point")
+        ax.set_ylabel("Value")
+        path = save_and_send(fig, "lchart")
+        await ctx.send(file=discord.File(path))
+        os.remove(path)
   
     # ---------- HELP ----------
     @commands.command(name="graphhelp")
