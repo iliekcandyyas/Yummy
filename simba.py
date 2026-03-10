@@ -80,7 +80,7 @@ async def get_ai_reply(messages: list, ai: str) -> str:
             )
             return response.choices[0].message.content
         except Exception as e:
-            if "rate_limit" in str(e).lower() or "429" in str(e):
+            if any(x in str(e).lower() for x in ["rate_limit", "429", "rate limit", "tokens per day", "tpd"]):
                 groq_client = Groq(api_key=next(key_cycle))
                 response = groq_client.chat.completions.create(
                     model=GROQ_MODEL,
