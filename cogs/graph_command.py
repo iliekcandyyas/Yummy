@@ -255,7 +255,7 @@ class GraphCog(commands.Cog):
   # ---------- LINE CHART ----------
 # Usage: Clanker linechart 10 25 30 18 45 60
 @commands.command(name="lchart")
-async def linechart(self, ctx, *, data: str):
+async def lchart(self, ctx, *, data: str):
     try:
         values = [float(v) for v in data.split()]
     except ValueError:
