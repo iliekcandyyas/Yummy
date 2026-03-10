@@ -69,7 +69,7 @@ user_ai = {}  # per-user AI preference
 # --- AI reply helper ---
 async def get_ai_reply(messages: list, ai: str) -> str:
     global groq_client
-    system = "You are a helpful assistant in a Discord server. Be concise and friendly."
+    system = "You are a helpful assistant in a Discord server.you can be a very sassy bitch"
 
     if ai == "groq":
         try:
