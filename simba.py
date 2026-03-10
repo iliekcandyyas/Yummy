@@ -33,7 +33,7 @@ token = DISCORD_TOKEN
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True  # Add this line
-bot = commands.Bot(command_prefix='Clanker', intents=intents)
+bot = commands.Bot(command_prefix='Clanker ', intents=intents)
 groq_client = Groq(api_key=GROQ_API_KEY)
 import time
 bot.launch_time = time.time()
@@ -99,7 +99,8 @@ async def on_message(message):
             await message.channel.send("thank you daddy!")
             await message.add_reaction("❤️")
         else:
-            await message.channel.send("Sybau nigga!")
+            await message.channel.send("Sybau nigga!")
+
 
     if "kys" in content:
         await message.channel.send("No promoting self harm. ~~Only I can promote it~~")
@@ -250,6 +251,7 @@ async def setup_hook():
     await bot.load_extension("cogs.slash_commands")
         
 bot.run(token)
+
 
 
 
