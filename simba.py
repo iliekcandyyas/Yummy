@@ -86,6 +86,9 @@ async def on_message(message):
 
     content = message.content.lower()
 
+
+    if message.author.id == 1348737415765954726 or message.author.id == 1304112685599690863:
+        await message.channel.send(f"Please fuck off — willingly")
     # ---- Auto-reactions ----
     if message.author.id == 1346416667466399746 or message.author.id == 1304112685599690863 or message.author.id == 1236143124481310764:
         try:
@@ -113,8 +116,8 @@ async def on_message(message):
 
     if bot.user in message.mentions:
         user_message = message.content.replace(f"<@{bot.user.id}>", "").strip()
-    elif message.content.startswith("^ "):
-        user_message = message.content[len("^ "):].strip()
+    elif message.content.startswith("Yummy, "):
+        user_message = message.content[len("Yummy, "):].strip()
 
     if user_message is not None:
         if not user_message:
@@ -251,6 +254,7 @@ async def setup_hook():
     await bot.load_extension("cogs.slash_commands")
         
 bot.run(token)
+
 
 
 
