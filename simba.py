@@ -33,7 +33,7 @@ token = DISCORD_TOKEN
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True  # Add this line
-bot = commands.Bot(command_prefix='^', intents=intents)
+bot = commands.Bot(command_prefix='clanker', intents=intents)
 groq_client = Groq(api_key=GROQ_API_KEY)
 import time
 bot.launch_time = time.time()
