@@ -91,7 +91,7 @@ async def get_ai_reply(messages: list, ai: str) -> str:
             raise
 
     elif ai == "gemini":
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.0-flash")
         history = []
         for m in messages[:-1]:
             role = "user" if m["role"] == "user" else "model"
@@ -111,7 +111,7 @@ async def get_ai_reply(messages: list, ai: str) -> str:
             message=messages[-1]["content"],
             chat_history=chat_history,
             preamble=system,
-            model="command-r"
+            model="command-a-03-2025"
         )
         return response.text
 
@@ -332,3 +332,4 @@ async def setup_hook():
     await bot.load_extension("cogs.slash_commands")
 
 bot.run(token)
+
