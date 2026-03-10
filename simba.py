@@ -113,8 +113,8 @@ async def on_message(message):
 
     if bot.user in message.mentions:
         user_message = message.content.replace(f"<@{bot.user.id}>", "").strip()
-    elif message.content.startswith("^chat "):
-        user_message = message.content[len("^chat "):].strip()
+    elif message.content.startswith("^ "):
+        user_message = message.content[len("^ "):].strip()
 
     if user_message is not None:
         if not user_message:
@@ -251,6 +251,7 @@ async def setup_hook():
     await bot.load_extension("cogs.slash_commands")
         
 bot.run(token)
+
 
 
 
