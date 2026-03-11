@@ -136,10 +136,7 @@ async def on_message(message):
 
     content = message.content.lower()
 
-    # ---- Annoying users ----
-    if message.author.id == 1348737415765954726 or message.author.id == 1304112685599690863:
-        await message.channel.send("Please fuck off — willingly")
-
+    
     # ---- Auto-reactions ----
     if message.author.id in (1346416667466399746, 1304112685599690863, 1236143124481310764):
         try:
