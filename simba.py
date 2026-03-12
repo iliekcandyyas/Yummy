@@ -37,7 +37,7 @@ GROQ_API_KEYS = [k.strip() for k in [
 if not GROQ_API_KEYS:
     raise SystemExit("No Groq API keys found! Add GROQ_API_KEY_1 to Railway Variables")
 
-key_cycle  = itertools.cycle(GROQ_API_KEYS)
+key_cycle   = itertools.cycle(GROQ_API_KEYS)
 groq_client = Groq(api_key=GROQ_API_KEYS[0])
 
 # --- Gemini & Cohere ---
@@ -63,13 +63,14 @@ bot.launch_time = time.time()
 
 ALLOWED_CHANNEL_IDS = None
 conversation_histories = {}
-user_ai = {}  # per-user AI preference
+user_ai = {}             # per-user AI preference
+hearts_disabled = set()  # users who turned hearts off
 
 
 # --- AI reply helper ---
 async def get_ai_reply(messages: list, ai: str) -> str:
     global groq_client
-    system = "You are a helpful assistant in a Discord server.you can be a very sassy bitch. if theres someone called Ilan, you're their mommy and he is also your creator"
+    system = "You are a helpful assistant in a Discord server. you can be a very sassy bitch. if theres someone called Ilan, you're their mommy and he is also your creator"
 
     if ai == "groq":
         try:
@@ -136,14 +137,13 @@ async def on_message(message):
 
     content = message.content.lower()
 
-    
     # ---- Auto-reactions ----
-    if message.author.id in(1346416667466399746, 1304112685599690863, 1236143124481310764):
-    if message.author.id not in hearts_disabled:
-        try:
-            await message.add_reaction("💗")
-        except (discord.Forbidden, discord.HTTPException):
-            pass
+    if message.author.id in (1346416667466399746, 1304112685599690863, 1236143124481310764):
+        if message.author.id not in hearts_disabled:
+            try:
+                await message.add_reaction("💗")
+            except (discord.Forbidden, discord.HTTPException):
+                pass
 
     # ---- Keyword responses ----
     if "good girl" in content:
@@ -196,6 +196,16 @@ async def on_message(message):
 
 
 # --- Commands ---
+@bot.command(name="heart")
+async def heart(ctx):
+    user_id = ctx.author.id
+    if user_id in hearts_disabled:
+        hearts_disabled.discard(user_id)
+        await ctx.send("💗 Hearts turned **on** for you!")
+    else:
+        hearts_disabled.add(user_id)
+        await ctx.send("💔 Hearts turned **off** for you!")
+
 @bot.command(name="switchai")
 async def switchai(ctx, ai: str = None):
     user_id = ctx.author.id
@@ -259,18 +269,6 @@ async def roll(ctx, sides: int = 6):
 async def userid(ctx, member: discord.Member = None):
     member = member or ctx.author
     await ctx.send(f'{member} = {member.id}')
-
-hearts_disabled = set() 
-
-@bot.command(name="heart")
-async def heart(ctx):
-    user_id = ctx.author.id
-    if user_id in hearts_disabled:
-        hearts_disabled.discard(user_id)
-        await ctx.send("💗 Hearts turned **on** for you!")
-    else:
-        hearts_disabled.add(user_id)
-        await ctx.send("💔 Hearts turned **off** for you!")
 
 @bot.command()
 async def coinflip(ctx):
@@ -342,4 +340,3 @@ async def setup_hook():
     await bot.load_extension("cogs.slash_commands")
 
 bot.run(token)
-
