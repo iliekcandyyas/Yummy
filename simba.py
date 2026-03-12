@@ -138,7 +138,8 @@ async def on_message(message):
 
     
     # ---- Auto-reactions ----
-    if message.author.id in (1304112685599690863, 1236143124481310764):
+    if message.author.id in   (1346416667466399746,   1304112685599690863, 1236143124481310764):
+    if message.author.id not in hearts_disabled:
         try:
             await message.add_reaction("💗")
         except (discord.Forbidden, discord.HTTPException):
@@ -258,6 +259,18 @@ async def roll(ctx, sides: int = 6):
 async def userid(ctx, member: discord.Member = None):
     member = member or ctx.author
     await ctx.send(f'{member} = {member.id}')
+
+hearts_disabled = set() 
+
+@bot.command(name="heart")
+async def heart(ctx):
+    user_id = ctx.author.id
+    if user_id in hearts_disabled:
+        hearts_disabled.discard(user_id)
+        await ctx.send("💗 Hearts turned **on** for you!")
+    else:
+        hearts_disabled.add(user_id)
+        await ctx.send("💔 Hearts turned **off** for you!")
 
 @bot.command()
 async def coinflip(ctx):
