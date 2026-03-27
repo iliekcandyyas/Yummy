@@ -320,17 +320,9 @@ class GraphCog(commands.Cog):
         ax.set_ylabel("Height (m)")
         ax.set_ylim(bottom=0)
 
-        path = save_and_send(fig, "trajectory")
+        path = save_and_send(fig, "trajectory"),
 
-        embed = discord.Embed(title=" Trajectory", color=0x7EB8F7)
-        embed.add_field(name="Range",          value=f"`{range_m:.2f} m`",    inline=True)
-        embed.add_field(name="Max Height",     value=f"`{max_height:.2f} m`", inline=True)
-        embed.add_field(name="Time of Flight", value=f"`{t_flight:.2f} s`",   inline=True)
-        embed.add_field(name="𝜃 Angle",          value=f"`{angle_deg}°`",       inline=True)
-        embed.add_field(name="Speed",          value=f"`{speed} m/s`",        inline=True)
-        embed.add_field(name="Gravity",        value=f"`{gravity} m/s²`",     inline=True)
-
-        await ctx.send(embed=embed, file=discord.File(path))
+file=discord.File(path))
         os.remove(path)
 
     # ---------- HELP ----------
