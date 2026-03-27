@@ -45,7 +45,6 @@ class GraphCog(commands.Cog):
         self.bot = bot
 
     # ---------- MULTI-FUNCTION GRAPH ----------
-    # Usage: ^graph sin(x), x**2, cos(x)*2
     @commands.command(name="graph")
     async def graph(self, ctx, *, expression: str):
         expressions = [e.strip() for e in expression.split(",")]
@@ -87,7 +86,7 @@ class GraphCog(commands.Cog):
     @commands.command(name="points")
     async def points(self, ctx, *values: float):
         if len(values) % 2 != 0:
-            return await ctx.send("❌ Provide pairs: `^points x y x y …`")
+            return await ctx.send("❌ Provide pairs: `Clanker points x y x y …`")
         xs = values[0::2]; ys = values[1::2]
         fig, ax = styled_fig()
         ax.scatter(xs, ys, color=COLORS[0], s=80, zorder=5)
@@ -183,17 +182,16 @@ class GraphCog(commands.Cog):
         os.remove(path)
 
     # ---------- BAR CHART ----------
-    # Usage: ^bar apples 5 bananas 3 cherries 8
     @commands.command(name="bar")
     async def bar(self, ctx, *, data: str):
         parts = data.split()
         if len(parts) % 2 != 0:
-            return await ctx.send("❌ Use: `^bar label value label value …`\nExample: `^bar apples 5 bananas 3`")
+            return await ctx.send("❌ Use: `Clanker bar label value label value …`")
         try:
             labels = parts[0::2]
             values = [float(v) for v in parts[1::2]]
         except ValueError:
-            return await ctx.send("❌ Values must be numbers. Example: `^bar apples 5 bananas 3`")
+            return await ctx.send("❌ Values must be numbers.")
         fig, ax = styled_fig()
         bars = ax.bar(labels, values, color=COLORS[:len(labels)], edgecolor="#1e1e2e", linewidth=1.5)
         for bar, val in zip(bars, values):
@@ -207,17 +205,16 @@ class GraphCog(commands.Cog):
         os.remove(path)
 
     # ---------- PIE CHART ----------
-    # Usage: ^pie apples 5 bananas 3 cherries 8
     @commands.command(name="pie")
     async def pie(self, ctx, *, data: str):
         parts = data.split()
         if len(parts) % 2 != 0:
-            return await ctx.send("❌ Use: `^pie label value label value …`\nExample: `^pie apples 5 bananas 3`")
+            return await ctx.send("❌ Use: `Clanker pie label value label value …`")
         try:
             labels = parts[0::2]
             values = [float(v) for v in parts[1::2]]
         except ValueError:
-            return await ctx.send("❌ Values must be numbers. Example: `^pie apples 5 bananas 3`")
+            return await ctx.send("❌ Values must be numbers.")
         fig, ax = plt.subplots(figsize=(7, 7))
         fig.patch.set_facecolor("#1e1e2e")
         ax.set_facecolor("#1e1e2e")
@@ -235,9 +232,7 @@ class GraphCog(commands.Cog):
         await ctx.send(file=discord.File(path))
         os.remove(path)
 
-    #----------lineargraph------
-
-#----------lineargraph------
+    # ---------- LGRAPH ----------
     @commands.command(name="lgraph")
     async def lgraph(self, ctx, x1: float, y1: float, x2: float, y2: float):
         fig, ax = styled_fig()
@@ -251,9 +246,7 @@ class GraphCog(commands.Cog):
         await ctx.send(file=discord.File(path))
         os.remove(path)
 
-
-  # ---------- LINE CHART ----------
-# Usage: Clanker lchart 10 25 30 18 45 60
+    # ---------- LINE CHART ----------
     @commands.command(name="lchart")
     async def lchart(self, ctx, *, data: str):
         try:
@@ -262,42 +255,105 @@ class GraphCog(commands.Cog):
             return await ctx.send("❌ Use: `Clanker lchart 10 25 30 18 45`\nAll values must be numbers.")
         if len(values) < 2:
             return await ctx.send("❌ Need at least 2 values.")
-
         fig, ax = styled_fig()
         xs = list(range(1, len(values) + 1))
         ax.plot(xs, values, color=COLORS[0], linewidth=2, marker="o", markersize=5)
         ax.fill_between(xs, values, alpha=0.1, color=COLORS[0])
-
         ax.annotate(str(values[0]), (xs[0], values[0]), textcoords="offset points",
                     xytext=(6, 6), color="white", fontsize=9)
         ax.annotate(str(values[-1]), (xs[-1], values[-1]), textcoords="offset points",
                     xytext=(6, 6), color="white", fontsize=9)
-
         ax.set_title("Line Chart")
         ax.set_xlabel("Point")
         ax.set_ylabel("Value")
         path = save_and_send(fig, "lchart")
         await ctx.send(file=discord.File(path))
         os.remove(path)
-  
+
+    # ---------- TRAJECTORY ----------
+    @commands.command(name="trajectory")
+    async def trajectory(self, ctx, *, args: str):
+        params = {}
+        for part in args.split():
+            if ":" in part:
+                key, val = part.split(":", 1)
+                params[key.lower()] = val
+        try:
+            angle_deg = float(params.get("angle", 45))
+            speed     = float(params.get("speed", 20))
+            gravity   = float(params.get("gravity", 9.8))
+        except ValueError:
+            return await ctx.send("❌ Invalid values. Example: `Clanker trajectory angle:45 speed:20 gravity:9.8`")
+        if not (0 < angle_deg < 90):
+            return await ctx.send("❌ Angle must be between 0 and 90 degrees.")
+        if speed <= 0:
+            return await ctx.send("❌ Speed must be greater than 0.")
+
+        angle_rad  = math.radians(angle_deg)
+        vx         = speed * math.cos(angle_rad)
+        vy         = speed * math.sin(angle_rad)
+        t_flight   = 2 * vy / gravity
+        t_peak     = vy / gravity
+        max_height = (vy ** 2) / (2 * gravity)
+        range_m    = vx * t_flight
+
+        t = np.linspace(0, t_flight, 500)
+        x = vx * t
+        y = vy * t - 0.5 * gravity * t ** 2
+
+        fig, ax = styled_fig()
+        ax.plot(x, y, color=COLORS[0], linewidth=2)
+        ax.fill_between(x, y, alpha=0.08, color=COLORS[0])
+
+        peak_x = vx * t_peak
+        ax.scatter([0, peak_x, range_m], [0, max_height, 0],
+                   color=[COLORS[1], COLORS[2], COLORS[1]], s=80, zorder=5)
+        ax.annotate(f"Peak\n({peak_x:.1f}m, {max_height:.1f}m)",
+                    (peak_x, max_height), textcoords="offset points",
+                    xytext=(8, 8), color="white", fontsize=9)
+        ax.annotate(f"Land\n({range_m:.1f}m)",
+                    (range_m, 0), textcoords="offset points",
+                    xytext=(-40, 12), color="white", fontsize=9)
+
+        ax.set_title(f"Trajectory  |  θ={angle_deg}°  v={speed}m/s  g={gravity}m/s²")
+        ax.set_xlabel("Horizontal Distance (m)")
+        ax.set_ylabel("Height (m)")
+        ax.set_ylim(bottom=0)
+
+        path = save_and_send(fig, "trajectory")
+
+        embed = discord.Embed(title="📐 Trajectory Results", color=0x7EB8F7)
+        embed.add_field(name="🎯 Range",          value=f"`{range_m:.2f} m`",    inline=True)
+        embed.add_field(name="📈 Max Height",     value=f"`{max_height:.2f} m`", inline=True)
+        embed.add_field(name="⏱ Time of Flight", value=f"`{t_flight:.2f} s`",   inline=True)
+        embed.add_field(name="📐 Angle",          value=f"`{angle_deg}°`",       inline=True)
+        embed.add_field(name="🚀 Speed",          value=f"`{speed} m/s`",        inline=True)
+        embed.add_field(name="🌍 Gravity",        value=f"`{gravity} m/s²`",     inline=True)
+
+        await ctx.send(embed=embed, file=discord.File(path))
+        os.remove(path)
+
     # ---------- HELP ----------
     @commands.command(name="graphhelp")
     async def graphhelp(self, ctx):
         embed = discord.Embed(title="📊 Graph Commands", color=0x7EB8F7)
-        embed.set_footer(text="Separate multiple functions with commas")
+        embed.set_footer(text="Prefix: Clanker")
         cmds = [
-            ("^graph sin(x), x**2", "Plot one or more functions"),
-            ("^point 3 5", "Plot a single point"),
-            ("^points 1 2 3 4 5 6", "Plot multiple points"),
-            ("^line x1 y1 x2 y2", "Draw a line between two points"),
-            ("^graphpoints sin(x) 0 0 1 1", "Function + overlay points"),
-            ("^rect x1 y1 x2 y2", "Draw a rectangle with stats"),
-            ("^triangle x1 y1 x2 y2 x3 y3", "Draw a triangle with stats"),
-            ("^bar apples 5 bananas 3", "Bar chart from label/value pairs"),
-            ("^pie apples 5 bananas 3", "Pie chart from label/value pairs"),
+            ("graph sin(x), x**2", "Plot one or more functions"),
+            ("point 3 5", "Plot a single point"),
+            ("points 1 2 3 4 5 6", "Plot multiple points"),
+            ("line x1 y1 x2 y2", "Draw a line between two points"),
+            ("graphpoints sin(x) 0 0 1 1", "Function + overlay points"),
+            ("rect x1 y1 x2 y2", "Draw a rectangle with stats"),
+            ("triangle x1 y1 x2 y2 x3 y3", "Draw a triangle with stats"),
+            ("bar apples 5 bananas 3", "Bar chart"),
+            ("pie apples 5 bananas 3", "Pie chart"),
+            ("lgraph x1 y1 x2 y2", "Line between two points"),
+            ("lchart 10 25 30 18", "Line/stock-style chart"),
+            ("trajectory angle:45 speed:20 gravity:9.8", "Projectile trajectory"),
         ]
         for name, val in cmds:
-            embed.add_field(name=f"`{name}`", value=val, inline=False)
+            embed.add_field(name=f"`Clanker {name}`", value=val, inline=False)
         await ctx.send(embed=embed)
 
 
