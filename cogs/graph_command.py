@@ -283,11 +283,11 @@ class GraphCog(commands.Cog):
             speed     = float(params.get("speed", 20))
             gravity   = float(params.get("gravity", 9.8))
         except ValueError:
-            return await ctx.send("❌ Invalid values. Example: `Clanker trajectory angle:45 speed:20 gravity:9.8`")
+            return await ctx.send(" Invalid values. Example: `Clanker trajectory angle:45 speed:20 gravity:9.8`")
         if not (0 < angle_deg < 90):
-            return await ctx.send("❌ Angle must be between 0 and 90 degrees.")
+            return await ctx.send(" Angle must be between 0 and 90 degrees.")
         if speed <= 0:
-            return await ctx.send("❌ Speed must be greater than 0.")
+            return await ctx.send(" Speed must be greater than 0.")
 
         angle_rad  = math.radians(angle_deg)
         vx         = speed * math.cos(angle_rad)
@@ -322,13 +322,13 @@ class GraphCog(commands.Cog):
 
         path = save_and_send(fig, "trajectory")
 
-        embed = discord.Embed(title="📐 Trajectory Results", color=0x7EB8F7)
-        embed.add_field(name="🎯 Range",          value=f"`{range_m:.2f} m`",    inline=True)
-        embed.add_field(name="📈 Max Height",     value=f"`{max_height:.2f} m`", inline=True)
-        embed.add_field(name="⏱ Time of Flight", value=f"`{t_flight:.2f} s`",   inline=True)
-        embed.add_field(name="📐 Angle",          value=f"`{angle_deg}°`",       inline=True)
-        embed.add_field(name="🚀 Speed",          value=f"`{speed} m/s`",        inline=True)
-        embed.add_field(name="🌍 Gravity",        value=f"`{gravity} m/s²`",     inline=True)
+        embed = discord.Embed(title=" Trajectory", color=0x7EB8F7)
+        embed.add_field(name="Range",          value=f"`{range_m:.2f} m`",    inline=True)
+        embed.add_field(name="Max Height",     value=f"`{max_height:.2f} m`", inline=True)
+        embed.add_field(name="Time of Flight", value=f"`{t_flight:.2f} s`",   inline=True)
+        embed.add_field(name="𝜃 Angle",          value=f"`{angle_deg}°`",       inline=True)
+        embed.add_field(name="Speed",          value=f"`{speed} m/s`",        inline=True)
+        embed.add_field(name="Gravity",        value=f"`{gravity} m/s²`",     inline=True)
 
         await ctx.send(embed=embed, file=discord.File(path))
         os.remove(path)
